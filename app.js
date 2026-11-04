@@ -64,7 +64,42 @@ const P=[
 ["Study","Exam notes","Make short revision notes on {topic} with key terms, formulas and 5 likely exam questions.",{topic:"Newton's laws"}],
 ["Study","Explain simply","Explain {topic} like I am 12, using one everyday example and a 3-line summary.",{topic:"inflation"}],
 ["Study","Study timetable","Create a {weeks}-week study timetable for {exam}. I can study {hours} hours a day.",{weeks:"6",exam:"board exams",hours:"4"}],
-["Study","Interview prep","Ask me 10 {role} interview questions one by one and give feedback on each answer.",{role:"fresher software"}]];
+["Study","Interview prep","Ask me 10 {role} interview questions one by one and give feedback on each answer.",{role:"fresher software"}],
+["Website","Coming soon page","Write copy and HTML for a coming-soon page for {business}: headline, subtext, email signup, countdown.",{business:"a bakery"}],
+["Website","Blog outline","Create a detailed blog outline on {topic} for {audience} with H2/H3 headings and target keywords.",{topic:"AI tools",audience:"students"}],
+["Website","Pricing page","Write a pricing page for {product} with 3 plans, feature list, FAQ and a strong CTA.",{product:"a photo editing app"}],
+["Social Media","Story ideas","Give 15 {platform} story ideas for a {niche} page that drive replies and saves.",{platform:"Instagram",niche:"fitness"}],
+["Social Media","Trend caption","Write 5 captions that connect {trend} to my {niche} content, each with a hook and CTA.",{trend:"a viral audio",niche:"food"}],
+["Social Media","Giveaway post","Write a giveaway post for {brand} with simple rules, deadline and hashtags. Platform: {platform}.",{brand:"a skincare shop",platform:"Instagram"}],
+["AI Images","App icon","App icon for {app}, {style} style, bold simple shape, {palette} colors, rounded square, no text.",{app:"a habit tracker",style:"flat",palette:"purple and mint"}],
+["AI Images","Anime character","Anime style character: {subject}, {mood} mood, detailed eyes, clean line art, soft shading, full body.",{subject:"a student with a backpack",mood:"cheerful"}],
+["AI Images","Fantasy landscape","Wide fantasy landscape: {scene}, {light}, epic scale, matte painting, highly detailed.",{scene:"floating islands over a sea of clouds",light:"golden sunset"}],
+["AI Video","Drone shot","Aerial drone shot of {scene}, {light}, slow forward glide, cinematic, 5 seconds, no text.",{scene:"a coastal village",light:"early morning light"}],
+["AI Video","Food ad","Close-up food ad of {dish}, steam rising, {light}, slow motion, 5 seconds, vertical 9:16, no text.",{dish:"hot jalebi",light:"warm light"}],
+["AI Video","Explainer scenes","Break a 30-second explainer about {topic} into 6 scenes with visuals, narration and on-screen text.",{topic:"how UPI works"}],
+["Coding","Refactor","Refactor this {language} code for readability and performance. Explain every change.\n\n{code}",{language:"Python",code:"[paste code]"}],
+["Coding","Regex helper","Write a regex to {task}. Give 5 test cases and explain each part.",{task:"validate an Indian phone number"}],
+["Coding","Landing page code","Build a one-page {niche} landing page in HTML and Tailwind, mobile-first, with sections and a contact form.",{niche:"tuition center"}],
+["Coding","Git help","Explain how to {task} in Git step by step with commands and what each does.",{task:"undo my last commit"}],
+["YouTube","Hook ideas","Write 10 opening hooks (under 15 words) for a YouTube video about {topic}.",{topic:"free AI tools"}],
+["YouTube","Video outline","Outline a {mins}-minute YouTube video on {topic}: hook, sections with timestamps, CTA.",{mins:"8",topic:"prompt engineering"}],
+["Business","Business plan","Write a one-page business plan for {business} in {city}: problem, customers, offer, costs, revenue, first 30 days.",{business:"a tiffin service",city:"Delhi"}],
+["Business","Ad copy","Write 5 Facebook and Instagram ad copies for {product} aimed at {audience}. Include headline and CTA.",{product:"an online course",audience:"college students"}],
+["Business","Meeting summary","Turn these meeting notes into a summary, decisions and an action list with owners.\n\n{notes}",{notes:"[paste notes]"}],
+["Business","LinkedIn post","Write a LinkedIn post about {topic} with a hook, 3 lessons and a question at the end. Tone: {tone}.",{topic:"my first client",tone:"humble"}],
+["Writing","Product description","Write 3 product descriptions for {product}, each under 60 words, highlighting {benefit}.",{product:"a leather wallet",benefit:"durability"}],
+["Writing","Speech writer","Write a {mins}-minute speech for {occasion}. Tone: {tone}. Include a personal story.",{mins:"3",occasion:"a farewell",tone:"warm"}],
+["Writing","Poem","Write a short poem about {topic} in a {mood} mood, 8 lines, simple words.",{topic:"monsoon",mood:"nostalgic"}],
+["AI Tools","Custom GPT brief","Write instructions for a custom AI assistant that helps with {task}. Include role, tone, rules and 3 sample chats.",{task:"resume writing"}],
+["AI Tools","Prompt tester","Here is my prompt: {prompt}. Find its weaknesses and give 3 improved versions.",{prompt:"[paste prompt]"}],
+["AI Tools","Automate a task","Suggest a free way to automate {task} using AI tools, with exact steps.",{task:"replying to customer queries"}],
+["Study","Flashcards","Make {n} flashcards (question and answer) on {topic} for {level}.",{n:"15",topic:"the French Revolution",level:"Class 9"}],
+["Study","Essay outline","Create an essay outline on {topic} with thesis, 4 arguments, counterargument and conclusion.",{topic:"social media and teenagers"}],
+["Study","Math steps","Solve this problem step by step and explain each step simply: {problem}",{problem:"[type problem]"}],
+["Study","Language practice","Be my {language} practice partner at {level} level. Start a conversation about {topic} and correct my mistakes.",{language:"English",level:"beginner",topic:"daily routine"}],
+["Study","Mock interview","Run a mock interview for a {role} position. Ask 8 questions one at a time and score my answers out of 10.",{role:"digital marketing"}]];
+const slug=i=>(P[i][0]+"-"+P[i][1]).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+if(document.getElementById("grid")){
 const $=s=>document.querySelector(s),cats=["All","Saved",...new Set(P.map(p=>p[0]))];
 let cat="All",q="",saved=JSON.parse(localStorage.getItem("ps_saved")||"[]"),cur;
 function render(){const l=P.map((p,i)=>({p,i})).filter(({p,i})=>(cat=="All"||(cat=="Saved"?saved.includes(i):p[0]==cat))&&(p[1]+p[2]+p[0]).toLowerCase().includes(q));
@@ -73,7 +108,7 @@ $("#count").textContent=l.length+" prompt templates"}
 $("#chips").innerHTML=cats.map(c=>`<button class="chip${c==cat?" on":""}">${c}</button>`).join("");
 $("#chips").onclick=e=>{if(!e.target.matches(".chip"))return;cat=e.target.textContent;document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c==e.target));render()};
 $("#q").oninput=e=>{q=e.target.value.toLowerCase();render()};
-function build(){let t=P[cur][2];document.querySelectorAll("#fields input").forEach(i=>t=t.split("{"+i.name+"}").join(i.value||"{"+i.name+"}"));$("#out").textContent=t}
+function build(){$("#page").href="/p/"+slug(cur);let t=P[cur][2];document.querySelectorAll("#fields input").forEach(i=>t=t.split("{"+i.name+"}").join(i.value||"{"+i.name+"}"));$("#out").textContent=t}
 $("#grid").onclick=e=>{const c=e.target.closest(".card");if(!c)return;cur=+c.dataset.i;const p=P[cur];$("#dt").textContent=p[1];
 $("#fields").innerHTML=Object.entries(p[3]).map(([k,v])=>`<label>${k}</label><input name="${k}" value="${v.replace(/"/g,"&quot;")}">`).join("");
 $("#save").textContent=saved.includes(cur)?"Saved ✓":"Save";build();$("#dlg").showModal()};
@@ -81,3 +116,6 @@ $("#fields").oninput=build;
 $("#copy").onclick=async e=>{await navigator.clipboard.writeText($("#out").textContent);e.target.textContent="Copied ✓";setTimeout(()=>e.target.textContent="Copy prompt",1500)};
 $("#save").onclick=e=>{saved=saved.includes(cur)?saved.filter(x=>x!=cur):[...saved,cur];localStorage.setItem("ps_saved",JSON.stringify(saved));e.target.textContent=saved.includes(cur)?"Saved ✓":"Save";render()};
 $("#close").onclick=()=>$("#dlg").close();$("#stats").textContent=P.length+" templates · "+(cats.length-2)+" categories · 100% free";render();
+
+$("#share").onclick=async()=>{const u=location.origin+"/p/"+slug(cur);try{if(navigator.share)await navigator.share({title:P[cur][1]+" — PromptPitara",url:u});else{await navigator.clipboard.writeText(u);$("#share").textContent="Link copied ✓"}}catch(e){}};
+}
