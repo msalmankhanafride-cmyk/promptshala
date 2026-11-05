@@ -11,8 +11,8 @@ const l=document.createElement("link");l.rel="canonical";l.href=location.origin+
 q("#c").textContent=(IC[c]||"")+" "+c;q("#h").textContent=t;
 q("#f").innerHTML=Object.entries(v).map(([k,x])=>`<label>${k}</label><input name="${k}" value="${x.replace(/"/g,"&quot;")}">`).join("");
 const b=()=>{let x=tpl;document.querySelectorAll("#f input").forEach(n=>x=x.split("{"+n.name+"}").join(n.value||"{"+n.name+"}"));q("#o").textContent=x};b();q("#f").oninput=b;
-q("#cp").onclick=async e=>{await navigator.clipboard.writeText(q("#o").textContent);e.target.textContent="Copied ✓";toast("Prompt copy ho gaya ✓ Ab AI tool mein paste karo");setTimeout(()=>e.target.textContent="Copy prompt",1500)};
-q("#sh").onclick=async e=>{const u=location.href;try{if(navigator.share)await navigator.share({title:t,url:u});else{await navigator.clipboard.writeText(u);e.target.textContent="Link copied ✓"}}catch(x){}};
+q("#cp").onclick=async e=>{const ok=await copyText(q("#o").textContent);if(ok){e.target.textContent="Copied ✓";toast("Prompt copy ho gaya ✓ Ab AI tool mein paste karo");setTimeout(()=>e.target.textContent="Copy prompt",1500)}else toast("Copy nahi ho saka. Prompt select karke manually copy karein.")};
+q("#sh").onclick=async e=>{const u=location.href;try{if(navigator.share)await navigator.share({title:t,url:u});else{const ok=await copyText(u);if(ok)e.target.textContent="Link copied ✓";else toast("Link copy nahi ho saka.")}}catch(x){}};
 {const ex=typeof EX!="undefined"&&EX[sl];if(ex){q("#exs").hidden=false;q("#ext").textContent=ex}}
 q("#rel").innerHTML=P.map((p,k)=>k).filter(k=>k!=i&&P[k][0]==c).slice(0,6).map(k=>`<li><a href="/p/${slug(k)}">${P[k][1]}</a></li>`).join("")}
 </script></body></html>

@@ -100,11 +100,35 @@ const P=[
 ["Study","Mock interview","Run a mock interview for a {role} position. Ask 8 questions one at a time and score my answers out of 10.",{role:"digital marketing"}]];
 const slug=i=>(P[i][0]+"-"+P[i][1]).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const IC={"Website":"🌐","Social Media":"📱","AI Images":"🖼️","AI Video":"🎬","Coding":"💻","YouTube":"▶️","Business":"💼","Writing":"✍️","AI Tools":"🤖","Study":"📚"},CL={"Website":"#3B82F6","Social Media":"#EC4899","AI Images":"#A855F7","AI Video":"#EF4444","Coding":"#10B981","YouTube":"#F97316","Business":"#EAB308","Writing":"#14B8A6","AI Tools":"#6366F1","Study":"#22C55E"};
+// Storage and clipboard helpers: keep the site usable when browser permissions/storage fail.
+function safeReadSaved(){
+  try {
+    const raw=localStorage.getItem("ps_saved");
+    if(!raw) return [];
+    const value=JSON.parse(raw);
+    return Array.isArray(value)?[...new Set(value.filter(x=>Number.isInteger(x)&&x>=0&&x<P.length))]:[];
+  } catch(err) { console.warn("PromptPitara: saved prompts could not be read",err); return []; }
+}
+function safeWriteSaved(value){
+  try { localStorage.setItem("ps_saved",JSON.stringify(value)); return true; }
+  catch(err) { console.warn("PromptPitara: saved prompts could not be saved",err); return false; }
+}
+async function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    try { await navigator.clipboard.writeText(text); return true; } catch(err) { console.warn("Clipboard API unavailable; trying fallback",err); }
+  }
+  const area=document.createElement("textarea");
+  area.value=text; area.setAttribute("readonly","");
+  area.style.position="fixed"; area.style.opacity="0"; area.style.pointerEvents="none";
+  document.body.appendChild(area); area.select(); area.setSelectionRange(0,area.value.length);
+  let ok=false; try { ok=document.execCommand("copy"); } catch(err) { console.warn("Copy fallback failed",err); }
+  area.remove(); return ok;
+}
 function toast(m){let t=document.getElementById("toast");if(!t){t=document.createElement("div");t.id="toast";t.style.cssText="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#12202A;color:#fff;padding:12px 20px;border-radius:99px;z-index:99;font:600 15px Hind,sans-serif;box-shadow:0 6px 24px #0006;transition:opacity .2s;width:max-content;max-width:90vw;text-align:center"}(document.querySelector("dialog[open]")||document.body).appendChild(t);t.textContent=m;t.style.opacity=1;clearTimeout(t._h);t._h=setTimeout(()=>t.style.opacity=0,2000)}
 document.addEventListener("focusin",e=>{if(e.target.matches("input"))setTimeout(()=>e.target.scrollIntoView({block:"center",behavior:"smooth"}),300)});
 if(document.getElementById("grid")){
 const $=s=>document.querySelector(s),cats=["All","Saved",...new Set(P.map(p=>p[0]))];
-let cat="All",q="",saved=JSON.parse(localStorage.getItem("ps_saved")||"[]"),cur;
+let cat="All",q="",saved=safeReadSaved(),cur;
 function render(){const l=P.map((p,i)=>({p,i})).filter(({p,i})=>(cat=="All"||(cat=="Saved"?saved.includes(i):p[0]==cat))&&(p[1]+p[2]+p[0]).toLowerCase().includes(q));
 $("#grid").innerHTML=l.length?l.map(({p,i})=>`<button class="card" data-i="${i}" style="border-left:4px solid ${CL[p[0]]||"#999"}"><small>${IC[p[0]]||""} ${p[0]}</small><h3>${p[1]}</h3><span>${p[2].slice(0,95)}…</span></button>`).join(""):'<p class="empty">Kuch nahi mila. Doosra shabd try karo.</p>';
 $("#count").textContent=l.length+" prompt templates"}
@@ -116,9 +140,9 @@ $("#grid").onclick=e=>{const c=e.target.closest(".card");if(!c)return;cur=+c.dat
 $("#fields").innerHTML=Object.entries(p[3]).map(([k,v])=>`<label>${k}</label><input name="${k}" value="${v.replace(/"/g,"&quot;")}">`).join("");
 $("#save").textContent=saved.includes(cur)?"Saved ✓":"Save";$("#exd").open=false;build();$("#dlg").showModal()};
 $("#fields").oninput=build;
-$("#copy").onclick=async e=>{await navigator.clipboard.writeText($("#out").textContent);e.target.textContent="Copied ✓";toast("Prompt copy ho gaya ✓ Ab AI tool mein paste karo");setTimeout(()=>e.target.textContent="Copy prompt",1500)};
-$("#save").onclick=e=>{saved=saved.includes(cur)?saved.filter(x=>x!=cur):[...saved,cur];localStorage.setItem("ps_saved",JSON.stringify(saved));e.target.textContent=saved.includes(cur)?"Saved ✓":"Save";render()};
+$("#copy").onclick=async e=>{const ok=await copyText($("#out").textContent);if(ok){e.target.textContent="Copied ✓";toast("Prompt copy ho gaya ✓ Ab AI tool mein paste karo");setTimeout(()=>e.target.textContent="Copy prompt",1500)}else{toast("Copy nahi ho saka. Prompt select karke manually copy karein.");}};
+$("#save").onclick=e=>{const next=saved.includes(cur)?saved.filter(x=>x!==cur):[...saved,cur];if(!safeWriteSaved(next)){toast("Browser storage unavailable. Saved prompts may not persist.");return;}saved=next;e.target.textContent=saved.includes(cur)?"Saved ✓":"Save";render()};
 $("#close").onclick=()=>$("#dlg").close();$("#stats").textContent=P.length+" templates · "+(cats.length-2)+" categories · 100% free";render();
 
-$("#share").onclick=async()=>{const u=location.origin+"/p/"+slug(cur);try{if(navigator.share)await navigator.share({title:P[cur][1]+" — PromptPitara",url:u});else{await navigator.clipboard.writeText(u);$("#share").textContent="Link copied ✓"}}catch(e){}};
+$("#share").onclick=async()=>{const u=location.origin+"/p/"+slug(cur);try{if(navigator.share)await navigator.share({title:P[cur][1]+" — PromptPitara",url:u});else{const ok=await copyText(u);if(ok)$("#share").textContent="Link copied ✓";else toast("Link copy nahi ho saka.")}}catch(e){}};
 }
