@@ -8,7 +8,7 @@ if(i<0){q("#h").textContent="Prompt nahi mila";q("main").innerHTML+='<p><a href=
 const [c,t,tpl,v]=P[i];document.title=t+" — Free AI Prompt | PromptPitara";
 q('meta[name=description]').content=tpl.slice(0,150).replace(/\{|\}/g,"")+"…";
 const l=document.createElement("link");l.rel="canonical";l.href=location.origin+"/p/"+sl;document.head.appendChild(l);
-q("#c").textContent=c;q("#h").textContent=t;
+q("#c").textContent=(IC[c]||"")+" "+c;q("#h").textContent=t;
 q("#f").innerHTML=Object.entries(v).map(([k,x])=>`<label>${k}</label><input name="${k}" value="${x.replace(/"/g,"&quot;")}">`).join("");
 const b=()=>{let x=tpl;document.querySelectorAll("#f input").forEach(n=>x=x.split("{"+n.name+"}").join(n.value||"{"+n.name+"}"));q("#o").textContent=x};b();q("#f").oninput=b;
 q("#cp").onclick=async e=>{await navigator.clipboard.writeText(q("#o").textContent);e.target.textContent="Copied ✓";toast("Prompt copy ho gaya ✓ Ab AI tool mein paste karo");setTimeout(()=>e.target.textContent="Copy prompt",1500)};
