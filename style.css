@@ -47,3 +47,13 @@ dialog .row{position:sticky;bottom:-24px;padding:12px 0 2px;background:var(--bg)
   dialog .row>*{flex:1 1 calc(50% - 8px);text-align:center}
   .page h1{font-size:clamp(28px,8vw,38px)}
 }
+
+/* PromptPitara v2: custom prompt builder */
+.quick-builder{margin:26px 0 24px;padding:22px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 28px #00000008}
+.quick-builder h2{font-size:clamp(23px,4vw,30px);margin-bottom:8px}.quick-builder>p{color:var(--mute);margin:0 0 16px}
+.builder-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.builder-grid label,.quick-builder>label{display:block;color:var(--mute);font-size:14px;font-weight:600}
+.builder-grid input,.builder-grid select,.quick-builder textarea{display:block;margin-top:5px;width:100%;min-width:0;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:var(--bg);color:var(--ink);font:inherit;font-size:15px}
+.builder-actions{margin-top:12px}.builder-actions button:disabled{opacity:.45;cursor:not-allowed}
+.builder-output{min-height:110px;margin-bottom:8px}.builder-note{font-size:13px!important;margin:0!important}
+@media(max-width:560px){.quick-builder{padding:16px}.builder-grid{grid-template-columns:1fr}.builder-actions>*{flex:1 1 100%}}

@@ -97,9 +97,19 @@ const P=[
 ["Study","Essay outline","Create an essay outline on {topic} with thesis, 4 arguments, counterargument and conclusion.",{topic:"social media and teenagers"}],
 ["Study","Math steps","Solve this problem step by step and explain each step simply: {problem}",{problem:"[type problem]"}],
 ["Study","Language practice","Be my {language} practice partner at {level} level. Start a conversation about {topic} and correct my mistakes.",{language:"English",level:"beginner",topic:"daily routine"}],
-["Study","Mock interview","Run a mock interview for a {role} position. Ask 8 questions one at a time and score my answers out of 10.",{role:"digital marketing"}]];
+["Study","Mock interview","Run a mock interview for a {role} position. Ask 8 questions one at a time and score my answers out of 10.",{role:"digital marketing"}],
+["Game Development","2D game concept","Act as an experienced 2D game designer. Create a complete concept for a {genre} game for {platform}. Target audience: {audience}. Define the core gameplay loop, controls, art direction, progression, 5 levels, difficulty curve, accessibility options and a realistic MVP scope. Keep the design achievable for a small beginner team.",{genre:"platformer",platform:"mobile",audience:"casual players"}],
+["Game Development","3D game concept","Design a 3D {genre} game for {engine}. Target platform: {platform}. Provide the core loop, camera system, movement, combat or interaction mechanics, world design, progression, performance targets and a milestone-based MVP plan. Avoid feature creep.",{genre:"adventure",engine:"Unity",platform:"Android"}],
+["Game Development","Game character design","Create a production-ready character brief for a {role} character in a {style} game. Include silhouette, proportions, personality, backstory, abilities, color palette, outfit details, animation states and variations for gameplay readability.",{role:"main hero",style:"stylized 3D"}],
+["Game Development","Level design blueprint","Design a {type} level for a {genre} game. Player skill level: {skill}. Include objective, layout zones, player path, obstacles, enemy placement, checkpoints, rewards, secrets, pacing and playtest questions. Explain the intended player experience.",{type:"tutorial",genre:"action adventure",skill:"beginner"}],
+["Game Development","Unity C# feature builder","Act as a senior Unity C# developer. Implement {feature} for a {game_type} game. Explain required GameObjects and components, provide complete scripts, inspector setup, input handling, edge cases and a small test plan. Do not invent APIs; state the Unity version assumptions.",{feature:"third-person movement",game_type:"3D"}],
+["Game Development","Unreal Engine blueprint planner","Plan an Unreal Engine Blueprint implementation for {feature} in a {game_type} game. Give the required actors/components, variables, events, node flow in logical order, input mapping, edge cases and debugging checks. Assume Unreal Engine 5 unless stated otherwise.",{feature:"basic enemy AI",game_type:"3D"}],
+["Game Development","Game UI and HUD design","Design a clean game UI for a {genre} game on {platform}. Include HUD hierarchy, health or resource indicators, menus, pause flow, settings, controller/touch behavior, accessibility and responsive safe areas. Describe each screen and interaction.",{genre:"fighting",platform:"mobile"}],
+["Game Development","Game bug investigator","Act as a game QA engineer. Investigate this {engine} issue: {issue}. Ask for missing reproduction details if needed. Then identify likely causes, rank them by probability, suggest safe diagnostic steps, propose a fix and provide regression tests. Do not rewrite unrelated systems. ",{engine:"Unity",issue:"player movement stops after opening pause menu"}],
+["Game Development","Mobile game optimization","Audit a {engine} game for Android performance. Target devices: {devices}. Review frame rate, memory, loading, draw calls, textures, UI, battery use and input latency. Give a prioritized optimization plan with measurable targets and profiling steps.",{engine:"Unity",devices:"low and mid-range phones"}],
+["Game Development","Game monetization and retention review","Evaluate this game concept: {concept}. Audience: {audience}. Propose ethical monetization options, retention loops, onboarding improvements and live-ops ideas. Estimate development complexity and risks; do not rely on manipulative dark patterns.",{concept:"casual puzzle game",audience:"teen and adult mobile players"}],];
 const slug=i=>(P[i][0]+"-"+P[i][1]).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-const IC={"Website":"🌐","Social Media":"📱","AI Images":"🖼️","AI Video":"🎬","Coding":"💻","YouTube":"▶️","Business":"💼","Writing":"✍️","AI Tools":"🤖","Study":"📚"},CL={"Website":"#3B82F6","Social Media":"#EC4899","AI Images":"#A855F7","AI Video":"#EF4444","Coding":"#10B981","YouTube":"#F97316","Business":"#EAB308","Writing":"#14B8A6","AI Tools":"#6366F1","Study":"#22C55E"};
+const IC={"Website":"🌐","Social Media":"📱","AI Images":"🖼️","AI Video":"🎬","Coding":"💻","YouTube":"▶️","Business":"💼","Writing":"✍️","AI Tools":"🤖","Study":"📚","Game Development":"🎮"},CL={"Website":"#3B82F6","Social Media":"#EC4899","AI Images":"#A855F7","AI Video":"#EF4444","Coding":"#10B981","YouTube":"#F97316","Business":"#EAB308","Writing":"#14B8A6","AI Tools":"#6366F1","Study":"#22C55E","Game Development":"#8B5CF6"};
 // Storage and clipboard helpers: keep the site usable when browser permissions/storage fail.
 function safeReadSaved(){
   try {
@@ -129,7 +139,7 @@ document.addEventListener("focusin",e=>{if(e.target.matches("input"))setTimeout(
 if(document.getElementById("grid")){
 const $=s=>document.querySelector(s),cats=["All","Saved",...new Set(P.map(p=>p[0]))];
 let cat="All",q="",saved=safeReadSaved(),cur;
-function render(){const l=P.map((p,i)=>({p,i})).filter(({p,i})=>(cat=="All"||(cat=="Saved"?saved.includes(i):p[0]==cat))&&(p[1]+p[2]+p[0]).toLowerCase().includes(q));
+function render(){const l=P.map((p,i)=>({p,i})).filter(({p,i})=>(cat=="All"||(cat=="Saved"?saved.includes(i):p[0]==cat))&&(p[1]+p[2]+p[0]+Object.keys(p[3]).join(" ")+Object.values(p[3]).join(" ")).toLowerCase().includes(q));
 $("#grid").innerHTML=l.length?l.map(({p,i})=>`<button class="card" data-i="${i}" style="border-left:4px solid ${CL[p[0]]||"#999"}"><small>${IC[p[0]]||""} ${p[0]}</small><h3>${p[1]}</h3><span>${p[2].slice(0,95)}…</span></button>`).join(""):'<p class="empty">Kuch nahi mila. Doosra shabd try karo.</p>';
 $("#count").textContent=l.length+" prompt templates"}
 $("#chips").innerHTML=cats.map(c=>`<button class="chip${c==cat?" on":""}">${c}</button>`).join("");
@@ -146,3 +156,22 @@ $("#close").onclick=()=>$("#dlg").close();$("#stats").textContent=P.length+" tem
 
 $("#share").onclick=async()=>{const u=location.origin+"/p/"+slug(cur);try{if(navigator.share)await navigator.share({title:P[cur][1]+" — PromptPitara",url:u});else{const ok=await copyText(u);if(ok)$("#share").textContent="Link copied ✓";else toast("Link copy nahi ho saka.")}}catch(e){}};
 }
+
+// Lightweight prompt builder: generates a reusable brief locally; no API key or backend required.
+(function(){
+ const idea=document.getElementById("pb-idea"); if(!idea) return;
+ const type=document.getElementById("pb-type"),platform=document.getElementById("pb-platform"),style=document.getElementById("pb-style"),extra=document.getElementById("pb-extra"),out=document.getElementById("pb-output"),copy=document.getElementById("pb-copy");
+ let generated="";
+ document.getElementById("pb-generate").addEventListener("click",()=>{
+  const subject=idea.value.trim(); if(!subject){idea.focus();out.textContent="Pehle apna idea likho, phir Generate prompt dabao.";copy.disabled=true;return;}
+  generated=`Act as a senior ${type.value} specialist. Help me create: ${subject}.
+
+Context and platform: ${platform.value.trim()||"Choose the most suitable platform and state your assumption."}
+Style and quality direction: ${style.value.trim()||"Professional, clear, user-focused and polished."}
+Additional requirements: ${extra.value.trim()||"Identify essential requirements before making assumptions."}
+
+Work systematically. First summarize the goal and list any critical assumptions. Then provide a practical plan, the complete deliverable, and clear implementation or usage steps. Prioritize functionality, accessibility, performance, maintainability and realistic scope. Do not invent facts or claim that untested work has been verified. If information is missing, ask concise clarifying questions instead of guessing.`;
+  out.textContent=generated;copy.disabled=false;
+ });
+ copy.addEventListener("click",async()=>{if(!generated)return;const ok=await copyText(generated);toast(ok?"Custom prompt copied ✓":"Copy nahi ho saka. Prompt select karke manually copy karein.");});
+})();
