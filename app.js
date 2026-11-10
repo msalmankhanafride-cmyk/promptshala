@@ -109,6 +109,7 @@ const P=[
 ["Game Development","Mobile game optimization","Audit a {engine} game for Android performance. Target devices: {devices}. Review frame rate, memory, loading, draw calls, textures, UI, battery use and input latency. Give a prioritized optimization plan with measurable targets and profiling steps.",{engine:"Unity",devices:"low and mid-range phones"}],
 ["Game Development","Game monetization and retention review","Evaluate this game concept: {concept}. Audience: {audience}. Propose ethical monetization options, retention loops, onboarding improvements and live-ops ideas. Estimate development complexity and risks; do not rely on manipulative dark patterns.",{concept:"casual puzzle game",audience:"teen and adult mobile players"}],];
 const slug=i=>(P[i][0]+"-"+P[i][1]).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const TH={"AI Images":"category-01","AI Video":"category-02","Business":"category-03","Social Media":"category-04","Website":"category-05","Coding":"category-05","Game Development":"category-06","AI Tools":"category-07","YouTube":"category-10","Writing":"category-04","Study":"category-05"};
 const IC={"Website":"🌐","Social Media":"📱","AI Images":"🖼️","AI Video":"🎬","Coding":"💻","YouTube":"▶️","Business":"💼","Writing":"✍️","AI Tools":"🤖","Study":"📚","Game Development":"🎮"},CL={"Website":"#3B82F6","Social Media":"#EC4899","AI Images":"#A855F7","AI Video":"#EF4444","Coding":"#10B981","YouTube":"#F97316","Business":"#EAB308","Writing":"#14B8A6","AI Tools":"#6366F1","Study":"#22C55E","Game Development":"#8B5CF6"};
 // Storage and clipboard helpers: keep the site usable when browser permissions/storage fail.
 function safeReadSaved(){
@@ -140,10 +141,13 @@ if(document.getElementById("grid")){
 const $=s=>document.querySelector(s),cats=["All","Saved",...new Set(P.map(p=>p[0]))];
 let cat="All",q="",saved=safeReadSaved(),cur;
 function render(){const l=P.map((p,i)=>({p,i})).filter(({p,i})=>(cat=="All"||(cat=="Saved"?saved.includes(i):p[0]==cat))&&(p[1]+p[2]+p[0]+Object.keys(p[3]).join(" ")+Object.values(p[3]).join(" ")).toLowerCase().includes(q));
-$("#grid").innerHTML=l.length?l.map(({p,i})=>`<button class="card" data-i="${i}" style="border-left:4px solid ${CL[p[0]]||"#999"}"><small>${IC[p[0]]||""} ${p[0]}</small><h3>${p[1]}</h3><span>${p[2].slice(0,95)}…</span></button>`).join(""):'<p class="empty">Kuch nahi mila. Doosra shabd try karo.</p>';
+$("#grid").innerHTML=l.length?l.map(({p,i})=>`<button class="card" data-i="${i}"><img class="prompt-thumb" src="/assets/categories/${TH[p[0]]||"category-01"}.webp" alt="" loading="lazy"><small>${IC[p[0]]||""} ${p[0]}</small><h3>${p[1]}</h3><span>${p[2].slice(0,110)}…</span></button>`).join(""):'<p class="empty">Kuch nahi mila. Doosra shabd try karo.</p>';
 $("#count").textContent=l.length+" prompt templates"}
 $("#chips").innerHTML=cats.map(c=>`<button class="chip${c==cat?" on":""}">${c}</button>`).join("");
-$("#chips").onclick=e=>{if(!e.target.matches(".chip"))return;cat=e.target.textContent;document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c==e.target));render()};
+function setCategory(next){cat=next;document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.textContent===cat));render()}
+$("#chips").onclick=e=>{if(!e.target.matches(".chip"))return;setCategory(e.target.textContent)};
+document.querySelectorAll(".category-tile").forEach(tile=>tile.addEventListener("click",()=>{setCategory(tile.dataset.category||"All")}));
+const savedShortcut=document.getElementById("saved-shortcut");if(savedShortcut)savedShortcut.addEventListener("click",()=>setCategory("Saved"));
 $("#q").oninput=e=>{q=e.target.value.toLowerCase();render()};
 function build(){$("#page").href="/p/"+slug(cur);{const x=typeof EX!="undefined"&&EX[slug(cur)];$("#exd").hidden=!x;if(x)$("#ext").textContent=x}let t=P[cur][2];document.querySelectorAll("#fields input").forEach(i=>t=t.split("{"+i.name+"}").join(i.value||"{"+i.name+"}"));$("#out").textContent=t}
 $("#grid").onclick=e=>{const c=e.target.closest(".card");if(!c)return;cur=+c.dataset.i;const p=P[cur];$("#dt").textContent=p[1];
